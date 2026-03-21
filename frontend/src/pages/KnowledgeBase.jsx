@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { UploadCloud, FileText, Trash2, CheckCircle, Clock, MessageSquare } from 'lucide-react';
+import { UploadCloud, FileText, Trash2, CheckCircle, Clock, MessageSquare, X } from 'lucide-react';
 import api from '../services/api';
 import './KnowledgeBase.css';
 
