@@ -1,0 +1,138 @@
+.kb-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1rem;
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+  margin-bottom: 3rem;
+}
+
+.dropzone.drag-active {
+  border-color: var(--accent-color);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.drop-icon {
+  color: var(--accent-color);
+  opacity: 0.8;
+}
+
+.shrink {
+  width: auto;
+  cursor: pointer;
+}
+
+.uploading-text {
+  color: var(--accent-color);
+  font-weight: 500;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.doc-list {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.doc-list h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.doc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.2s;
+}
+
+.doc-row:hover {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+.doc-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 500;
+}
+
+.doc-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+}
+
+.status.ready {
+  color: var(--success-color);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.status.pending {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.icon-btn {
+  padding: 0.5rem;
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+
+.icon-btn:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+.icon-btn.danger:hover {
+  color: var(--danger-color);
+}
+
+@media (max-width: 768px) {
+  .dropzone {
+    padding: 2rem 1rem;
+  }
+  .doc-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  .doc-status {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
