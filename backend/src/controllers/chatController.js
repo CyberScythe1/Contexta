@@ -206,4 +206,19 @@ const updateChat = async (req, res) => {
   }
 };
 
-module.exports = { getChats, createChat, getMessages, sendMessage, updateChat };
+const deleteChat = async (req, res) => {
+  try {
+    const chatId = req.params.id;
+    if (process.env.DATABASE_URL) {
+      await db.query('DELETE FROM chat_documents WHERE chat_id = $1', [chatId]);
+      await db.query('DELETE FROM messages WHERE chat_id = $1', [chatId]);
+      await db.query('DELETE FROM chats WHERE id = $1 AND user_id = $2', [chatId, req.user.id]);
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete chat' });
+  }
+};
+
+module.exports = { getChats, createChat, getMessages, sendMessage, updateChat, deleteChat };

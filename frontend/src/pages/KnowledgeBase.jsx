@@ -84,11 +84,14 @@ const KnowledgeBase = () => {
     }
   };
 
-  const handleDeleteDoc = async (docId) => {
+  const handleDeleteDoc = async (docId, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm("Are you sure you want to permanently delete this document and its vectorized memory?")) return;
     try {
       await api.delete(`/kb/${id}/documents/${docId}`);
       setDocuments(documents.filter(d => d.id !== docId));
       setSelectedDocs(selectedDocs.filter(d => d !== docId));
+      alert("Successfully deleted Document.");
     } catch (e) {
       console.error(e);
       alert('Failed to delete document');
@@ -148,7 +151,7 @@ const KnowledgeBase = () => {
               )}
               <button 
                 className="icon-btn danger" 
-                onClick={() => handleDeleteDoc(doc.id)}
+                onClick={(e) => handleDeleteDoc(doc.id, e)}
                 title="Delete Document"
               >
                 <Trash2 size={16} />

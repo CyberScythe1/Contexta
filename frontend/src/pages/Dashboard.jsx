@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Folder, MessageSquare, Edit2, Check, X } from 'lucide-react';
+import { Plus, Folder, MessageSquare, Edit2, Check, X, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import TutorialModal from '../components/TutorialModal';
 import './Dashboard.css';
@@ -56,6 +56,19 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteKB = async (kbId, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm("Are you sure you want to permanently delete this Knowledge Base and all its uploaded documents and chats?")) return;
+    try {
+      await api.delete(`/kb/${kbId}`);
+      setKnowledgeBases(knowledgeBases.filter(kb => kb.id !== kbId));
+      alert("Successfully deleted Knowledge Base.");
+    } catch (e) {
+      console.error(e);
+      alert('Failed to delete knowledge base');
+    }
+  };
+
   const submitEditChat = async (chatId) => {
     if (!editTitle.trim()) { setEditingChatId(null); return; }
     try {
@@ -64,6 +77,19 @@ const Dashboard = () => {
       setEditingChatId(null);
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleDeleteChat = async (chatId, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this specific chat thread?")) return;
+    try {
+      await api.delete(`/chats/${chatId}`);
+      setChats(chats.filter(c => c.id !== chatId));
+      alert("Successfully deleted Chat.");
+    } catch (e) {
+      console.error(e);
+      alert('Failed to delete chat');
     }
   };
 
@@ -105,8 +131,8 @@ const Dashboard = () => {
                 </Link>
                 <div className="card-actions" style={{ display: 'flex', gap: '0.5rem' }}>
                    <Link to={`/dashboard/kb/${kb.id}`} className="primary-btn sm outline" style={{textDecoration: 'none', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-color)'}}>Manage</Link>
-                   <button className="primary-btn sm" onClick={() => handleCreateChat(kb.id)}>Chat</button>
-                   <button className="icon-btn danger" style={{ padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', background: 'transparent', border: 'none', color: 'var(--danger-color)' }} onClick={() => handleDeleteKB(kb.id)}><X size={16}/></button>
+                   <button className="primary-btn sm" onClick={(e) => { e.stopPropagation(); handleCreateChat(kb.id) }}>Chat</button>
+                   <button className="icon-btn danger" style={{ padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', background: 'transparent', border: 'none', color: 'var(--danger-color)' }} onClick={(e) => handleDeleteKB(kb.id, e)}><X size={16}/></button>
                 </div>
               </div>
             ))}
