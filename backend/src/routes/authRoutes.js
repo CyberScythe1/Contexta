@@ -1,8 +1,10 @@
 const express = require('express');
-const { googleLogin } = require('../controllers/authController');
+const { googleLogin, completeTutorial } = require('../controllers/authController');
+const { requireAuth } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
 router.post('/google', googleLogin);
+router.put('/tutorial', requireAuth, completeTutorial);
 
 module.exports = router;

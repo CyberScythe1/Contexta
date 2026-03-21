@@ -34,11 +34,11 @@ const Layout = () => {
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''} ${isDesktopCollapsed ? 'desktop-collapsed' : ''}`}>
         <div className="sidebar-header">
           <Menu className="icon menu-btn" onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)} />
-          {!isDesktopCollapsed && <h2 onClick={() => navigate('/')} style={{ cursor: 'pointer', margin: 0 }}>Contexta</h2>}
+          {!isDesktopCollapsed && <h2 onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer', margin: 0 }}>Contexta</h2>}
           <X className="icon close-btn" onClick={() => setIsSidebarOpen(false)} />
         </div>
         <nav className="sidebar-nav">
-          <Link to="/" className="nav-item">
+          <Link to="/dashboard" className="nav-item">
             <Home className="icon"/> 
             {!isDesktopCollapsed && <span>Dashboard</span>}
           </Link>

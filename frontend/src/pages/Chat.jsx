@@ -40,7 +40,8 @@ const Chat = () => {
     setStreamingMessage('');
 
     try {
-      const response = await fetch(`http://localhost:5000/api/chats/${id}/messages`, {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${baseUrl}/chats/${id}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,6 +90,18 @@ const Chat = () => {
   return (
     <div className="chat-container">
       <div className="chat-messages">
+        {messages.length === 0 && !isTyping && !streamingMessage && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', textAlign: 'center', padding: '2rem' }}
+          >
+            <Bot size={64} style={{ marginBottom: '1.5rem', opacity: 0.2 }} />
+            <h2 style={{ fontSize: '1.75rem', marginBottom: '0.75rem', color: 'var(--text-primary)', fontWeight: 600 }}>Explore your Knowledge</h2>
+            <p style={{ maxWidth: '450px', lineHeight: '1.6', fontSize: '1.1rem' }}>Initiate the conversation by asking a question below. Contexta will scan the uploaded documents to synthesize a highly accurate answer.</p>
+          </motion.div>
+        )}
+
         <AnimatePresence>
           {messages.map((msg) => (
             <motion.div 

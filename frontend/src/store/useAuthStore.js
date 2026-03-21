@@ -21,8 +21,10 @@ const useAuthStore = create((set) => ({
 
   logout: () => {
     localStorage.removeItem('token');
-    set({ user: null, token: null });
+    set({ user: null, token: null, isAuthenticated: false });
   },
+
+  completeTutorialFn: () => set((state) => ({ user: { ...state.user, has_seen_tutorial: true } })),
   
   // mock hydration
   hydrate: () => {
@@ -30,10 +32,12 @@ const useAuthStore = create((set) => ({
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        set({ user: payload });
+        set({ user: payload, isAuthenticated: true });
       } catch (e) {
-        set({ user: { name: 'User', email: 'user@example.com', role: 'USER' } });
+        set({ user: { name: 'User', email: 'user@example.com', role: 'USER', has_seen_tutorial: false }, isAuthenticated: true });
       }
+    } else {
+       set({ isAuthenticated: false });
     }
   }
 }));

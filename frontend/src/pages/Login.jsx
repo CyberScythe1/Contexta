@@ -15,7 +15,7 @@ const Login = () => {
     try {
       if (credentialResponse.credential) {
          await login(credentialResponse.credential);
-         navigate('/');
+         navigate('/dashboard');
       }
     } catch (e) {
       console.error(e);

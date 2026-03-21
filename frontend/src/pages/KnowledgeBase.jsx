@@ -77,7 +77,7 @@ const KnowledgeBase = () => {
         title: `Chat with ${selectedDocs.length} file(s)`,
         documentIds: selectedDocs 
       });
-      navigate(`/chat/${res.data.id}`);
+      navigate(`/dashboard/chat/${res.data.id}`);
     } catch (e) {
       console.error(e);
       alert('Failed to launch selective chat');

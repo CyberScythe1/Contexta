@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Folder, MessageSquare, Edit2, Check, X } from 'lucide-react';
 import api from '../services/api';
+import TutorialModal from '../components/TutorialModal';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -33,7 +34,10 @@ const Dashboard = () => {
 
   const handleCreateKb = async (e) => {
     e.preventDefault();
-    if (!newKbName.trim()) return;
+    if (!newKbName.trim()) {
+      alert('Please fill in a valid Knowledge Base name before clicking Create.');
+      return;
+    }
     try {
       const res = await api.post('/kb', { name: newKbName });
       setKnowledgeBases([res.data, ...knowledgeBases]);
@@ -46,7 +50,7 @@ const Dashboard = () => {
   const handleCreateChat = async (kbId) => {
     try {
       const res = await api.post('/chats', { knowledgeBaseId: kbId, title: 'New Chat' });
-      navigate(`/chat/${res.data.id}`);
+      navigate(`/dashboard/chat/${res.data.id}`);
     } catch (e) {
       console.error(e);
     }
@@ -66,10 +70,11 @@ const Dashboard = () => {
   if (loading) return <div className="loader blur-loader"></div>;
 
   return (
-    <div className="dashboard">
+    <div className="dashboard-container">
+      <TutorialModal />
       <header className="page-header">
-        <h1>Welcome Back</h1>
-        <p>Manage your knowledge bases and recent chats.</p>
+        <h1>Welcome back</h1>
+        <p>Manage your Knowledge Bases and Recent Chats.</p>
       </header>
       
       <div className="dashboard-grid">
@@ -90,17 +95,18 @@ const Dashboard = () => {
           <div className="card-list">
             {knowledgeBases.length === 0 ? <p className="empty-state">No knowledge bases yet.</p> : null}
             {knowledgeBases.map(kb => (
-              <div key={kb.id} className="card kb-card">
-                <div className="card-info">
-                  <Folder className="icon accent" />
+              <div key={kb.id} className="card kb-card-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem' }}>
+                <Link to={`/dashboard/kb/${kb.id}`} className="kb-card-link" style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'inherit', textDecoration: 'none', flex: 1 }}>
+                  <Folder className="icon" />
                   <div>
-                    <h3>{kb.name}</h3>
-                    <small>{new Date(kb.created_at || Date.now()).toLocaleDateString()}</small>
+                    <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem' }}>{kb.name}</h3>
+                    <small style={{ color: 'var(--text-secondary)' }}>Created: {new Date(kb.created_at || Date.now()).toLocaleDateString()}</small>
                   </div>
-                </div>
-                <div className="card-actions">
-                  <button className="secondary-btn" onClick={() => handleCreateChat(kb.id)}>Chat</button>
-                  <Link to={`/kb/${kb.id}`} className="secondary-btn outline">Manage</Link>
+                </Link>
+                <div className="card-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+                   <Link to={`/dashboard/kb/${kb.id}`} className="primary-btn sm outline" style={{textDecoration: 'none', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-color)'}}>Manage</Link>
+                   <button className="primary-btn sm" onClick={() => handleCreateChat(kb.id)}>Chat</button>
+                   <button className="icon-btn danger" style={{ padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', background: 'transparent', border: 'none', color: 'var(--danger-color)' }} onClick={() => handleDeleteKB(kb.id)}><X size={16}/></button>
                 </div>
               </div>
             ))}
@@ -113,7 +119,7 @@ const Dashboard = () => {
             {chats.length === 0 ? <p className="empty-state">No recent chats.</p> : null}
             {chats.map(chat => (
               <div key={chat.id} className="card">
-                <Link to={`/chat/${chat.id}`} style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'inherit', textDecoration: 'none', flex: 1 }}>
+                <Link to={`/dashboard/chat/${chat.id}`} style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'inherit', textDecoration: 'none', flex: 1 }}>
                   <MessageSquare className="icon" />
                   <div>
                     {editingChatId === chat.id ? (

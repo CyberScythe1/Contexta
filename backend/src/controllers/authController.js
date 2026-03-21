@@ -49,7 +49,7 @@ const googleLogin = async (req, res) => {
 
     // Generate custom JWT
     const jwtToken = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, name: user.name },
+      { id: user.id, email: user.email, role: user.role, name: user.name, has_seen_tutorial: user.has_seen_tutorial || false },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '7d' }
     );
@@ -61,4 +61,25 @@ const googleLogin = async (req, res) => {
   }
 };
 
-module.exports = { googleLogin };
+const completeTutorial = async (req, res) => {
+  try {
+    let freshToken = req.headers.authorization?.split(' ')[1];
+    
+    if (process.env.DATABASE_URL) {
+      const result = await db.query('UPDATE users SET has_seen_tutorial = true WHERE id = $1 RETURNING *', [req.user.id]);
+      const user = result.rows[0];
+      const jwt = require('jsonwebtoken');
+      freshToken = jwt.sign(
+        { id: user.id, email: user.email, role: user.role, name: user.name, has_seen_tutorial: true },
+        process.env.JWT_SECRET || 'secret',
+        { expiresIn: '7d' }
+      );
+    }
+    
+    res.json({ success: true, has_seen_tutorial: true, token: freshToken });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update tutorial status' });
+  }
+};
+
+module.exports = { googleLogin, completeTutorial };
