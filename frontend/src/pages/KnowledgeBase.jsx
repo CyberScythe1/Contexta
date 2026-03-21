@@ -84,6 +84,17 @@ const KnowledgeBase = () => {
     }
   };
 
+  const handleDeleteDoc = async (docId) => {
+    try {
+      await api.delete(`/kb/${id}/documents/${docId}`);
+      setDocuments(documents.filter(d => d.id !== docId));
+      setSelectedDocs(selectedDocs.filter(d => d !== docId));
+    } catch (e) {
+      console.error(e);
+      alert('Failed to delete document');
+    }
+  };
+
   return (
     <div className="kb-container">
       <header className="page-header">
@@ -135,8 +146,13 @@ const KnowledgeBase = () => {
               ) : (
                 <span className="status pending"><Clock size={16}/> Processing...</span>
               )}
-              {/* Delete doc mockup */}
-              <button className="icon-btn danger"><Trash2 size={16} /></button>
+              <button 
+                className="icon-btn danger" 
+                onClick={() => handleDeleteDoc(doc.id)}
+                title="Delete Document"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           </div>
         ))}

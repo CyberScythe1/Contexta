@@ -36,11 +36,30 @@ const createKnowledgeBase = async (req, res) => {
 const deleteKnowledgeBase = async (req, res) => {
   try {
     if (process.env.DATABASE_URL) {
-      await db.query('DELETE FROM knowledge_bases WHERE id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+      const kbId = req.params.id;
+      // Native explicit CASCADE to satisfy strict PostgreSQL foreign key constraints 
+      // 1. Delete all explicit junction locks mapping documents to chats
+      await db.query('DELETE FROM chat_documents WHERE chat_id IN (SELECT id FROM chats WHERE knowledge_base_id = $1)', [kbId]);
+      
+      // 2. Delete all chat messages directly bound to any chat inside this KB
+      await db.query('DELETE FROM messages WHERE chat_id IN (SELECT id FROM chats WHERE knowledge_base_id = $1)', [kbId]);
+      
+      // 3. Delete completely empty nested chats in this KB
+      await db.query('DELETE FROM chats WHERE knowledge_base_id = $1', [kbId]);
+      
+      // 4. Delete the heavy vectorized chunks tied to explicit documents
+      await db.query('DELETE FROM document_chunks WHERE document_id IN (SELECT id FROM documents WHERE knowledge_base_id = $1)', [kbId]);
+      
+      // 5. Delete pointer references to documents in knowledge base
+      await db.query('DELETE FROM documents WHERE knowledge_base_id = $1', [kbId]);
+      
+      // 6. Delete the Knowledge Base object perfectly constraint-free
+      await db.query('DELETE FROM knowledge_bases WHERE id = $1 AND user_id = $2', [kbId, req.user.id]);
     }
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete KB' });
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete KB due to constraint locks' });
   }
 };
 
@@ -124,4 +143,20 @@ const uploadDocument = async (req, res) => {
   }
 };
 
-module.exports = { getKnowledgeBases, createKnowledgeBase, deleteKnowledgeBase, getDocuments, uploadDocument };
+const deleteDocument = async (req, res) => {
+  try {
+    const { id, docId } = req.params;
+    if (process.env.DATABASE_URL) {
+       // Cascade constraints logic manually for individual documents
+       await db.query('DELETE FROM chat_documents WHERE document_id = $1', [docId]);
+       await db.query('DELETE FROM document_chunks WHERE document_id = $1', [docId]);
+       await db.query('DELETE FROM documents WHERE id = $1 AND knowledge_base_id = $2', [docId, id]);
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete Document' });
+  }
+};
+
+module.exports = { getKnowledgeBases, createKnowledgeBase, deleteKnowledgeBase, getDocuments, uploadDocument, deleteDocument };
