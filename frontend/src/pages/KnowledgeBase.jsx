@@ -146,6 +146,8 @@ const KnowledgeBase = () => {
             <div className="doc-status">
               {doc.status === 'READY' ? (
                 <span className="status ready"><CheckCircle size={16}/> Ready</span>
+              ) : doc.status === 'ERROR' ? (
+                <span className="status error" style={{ color: 'var(--danger-color)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={16}/> Failed</span>
               ) : (
                 <span className="status pending"><Clock size={16}/> Processing...</span>
               )}

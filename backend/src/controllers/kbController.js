@@ -87,12 +87,12 @@ const chunkText = (text, maxLength = 1000, overlap = 200) => {
 };
 
 const uploadDocument = async (req, res) => {
+  let docId = 'mock-doc-id';
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     const kbId = req.params.id;
 
     // 1. Save document as pending
-    let docId = 'mock-doc-id';
     if (process.env.DATABASE_URL) {
       const docResult = await db.query(
         'INSERT INTO documents (knowledge_base_id, file_name, file_type, status) VALUES ($1, $2, $3, $4) RETURNING id',
@@ -101,22 +101,22 @@ const uploadDocument = async (req, res) => {
       docId = docResult.rows[0].id;
     }
 
-    // 2. Extract text
+    // 2. Extract text with robust fallback mapping
     let text = '';
-    if (req.file.mimetype === 'application/pdf') {
+    if (req.file.originalname.toLowerCase().endsWith('.pdf') || req.file.mimetype === 'application/pdf') {
        const pdfData = await pdfParse(req.file.buffer);
        text = pdfData.text;
     } else {
        text = req.file.buffer.toString('utf-8');
     }
 
-    // 3. Chunk text
+    // 3. Chunk text natively
     const chunks = chunkText(text);
 
-    // 4. Send response early to not block UI, process embeddings async
+    // 4. Send response safely
     res.status(202).json({ id: docId, message: 'Processing started', status: 'PROCESSING' });
 
-    // Process embeddings if we have the API key
+    // 5. Process embeddings in async background loop
     if (process.env.HUGGINGFACE_API_KEY && process.env.DATABASE_URL) {
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
@@ -129,17 +129,25 @@ const uploadDocument = async (req, res) => {
         const vectorStr = `[${embeddingArray.join(',')}]`;
 
         await db.query(
-          'INSERT INTO document_chunks (document_id, content, embedding, page_number) VALUES ($1, $2, $3, $4)',
-          [docId, chunk, vectorStr, 1] 
+           'INSERT INTO document_chunks (document_id, content, embedding, page_number) VALUES ($1, $2, $3, $4)',
+           [docId, chunk, vectorStr, 1] 
         );
       }
       await db.query('UPDATE documents SET status = $1 WHERE id = $2', ['READY', docId]);
     } else if (process.env.DATABASE_URL) {
        await db.query('UPDATE documents SET status = $1 WHERE id = $2', ['READY', docId]);
     }
+
   } catch (error) {
-    console.error('Upload Error:', error);
-    if (!res.headersSent) res.status(500).json({ error: 'Document upload failed' });
+    console.error('Upload Error explicitly caught:', error);
+    
+    // Safety Net: Unbind the Ghosting lock by forcing an exact database update on error!
+    if (docId !== 'mock-doc-id' && process.env.DATABASE_URL) {
+       try { await db.query('UPDATE documents SET status = $1 WHERE id = $2', ['ERROR', docId]); } 
+       catch (dbErr) { console.error('Double fault updating status hook:', dbErr); }
+    }
+    
+    if (!res.headersSent) res.status(500).json({ error: 'Document extraction or vector processing explicitly failed' });
   }
 };
 
