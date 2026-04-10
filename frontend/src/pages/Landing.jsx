@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Database, FileText, Bot, ShieldCheck, Zap, ArrowRight, LayoutDashboard, Search } from 'lucide-react';
+import { Database, FileText, Bot, ShieldCheck, Zap, ArrowRight, MessageSquare, Search } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
 import './Landing.css';
 
@@ -89,51 +89,51 @@ const Landing = () => {
           
           <div className="features-grid">
             <motion.div className="feature-card glass-panel" variants={itemVariants}>
-              <div className="icon-wrapper purple">
+              <div className="icon-wrapper">
                 <Database size={24} />
               </div>
-              <h3>Infinite Knowledge Bases</h3>
-              <p>Organize your context logically. Create multiple distinct knowledge silos to isolate your workspaces and keep data organized.</p>
+              <h3>Logical Workspaces</h3>
+              <p>Organize your context seamlessly. Create multiple distinct knowledge silos to isolate your projects and keep your research organized.</p>
             </motion.div>
             
             <motion.div className="feature-card glass-panel" variants={itemVariants}>
-              <div className="icon-wrapper blue">
+              <div className="icon-wrapper">
                 <Search size={24} />
               </div>
-              <h3>File-Specific Granularity</h3>
-              <p>Don't want to chat with everything? Select the exact PDFs or text files you want Contexta to analyze for highly accurate, hallucination-free generation.</p>
+              <h3>Targeted Analysis</h3>
+              <p>Don't want to chat with your entire library? Select the exact PDFs or text files you want analyzed for highly accurate, specific answers.</p>
             </motion.div>
 
             <motion.div className="feature-card glass-panel" variants={itemVariants}>
-              <div className="icon-wrapper pink">
+              <div className="icon-wrapper">
                 <Bot size={24} />
               </div>
-              <h3>Pluggable AI Models</h3>
-              <p>Choose your preferred brain. Natively switch between Gemini 1.5, OpenAI GPT-4o, and Hugging Face open-source models seamlessly.</p>
+              <h3>Intelligent Contextual AI</h3>
+              <p>Powered by cutting-edge AI that reads, understands, and synthesizes your documents into clear, human-like answers tailored to your queries.</p>
             </motion.div>
 
             <motion.div className="feature-card glass-panel" variants={itemVariants}>
-              <div className="icon-wrapper green">
-                <LayoutDashboard size={24} />
+              <div className="icon-wrapper">
+                <MessageSquare size={24} />
               </div>
-              <h3>Local & Cloud Ready</h3>
-              <p>Works out of the box with a beautiful mock UI for testing, but fully integrates with our robust local backend and PostgreSQL database.</p>
+              <h3>Persistent Chat History</h3>
+              <p>Never lose a brilliant thought. Seamlessly pick up where you left off with saved conversations and deeply contextualized chat threads.</p>
             </motion.div>
 
             <motion.div className="feature-card glass-panel" variants={itemVariants}>
-              <div className="icon-wrapper orange">
+              <div className="icon-wrapper">
                 <ShieldCheck size={24} />
               </div>
-              <h3>Secure Authentication</h3>
-              <p>Enterprise-grade security using Google OAuth ensures your private documents and conversation history remain strictly yours.</p>
+              <h3>Private & Secure</h3>
+              <p>Your data is strictly yours. We employ enterprise-grade security and strict isolation to ensure your private documents remain protected.</p>
             </motion.div>
 
             <motion.div className="feature-card glass-panel" variants={itemVariants}>
-              <div className="icon-wrapper yellow">
+              <div className="icon-wrapper">
                 <Zap size={24} />
               </div>
-              <h3>Lightning Fast Rag</h3>
-              <p>Built with pgvector for instant vector similarity search across thousands of pages to pull the exact paragraph you need in milliseconds.</p>
+              <h3>Instant Answers</h3>
+              <p>Stop skimming through thousands of pages. Ask a complex question and extract the absolute most relevant information in milliseconds.</p>
             </motion.div>
           </div>
         </motion.section>
